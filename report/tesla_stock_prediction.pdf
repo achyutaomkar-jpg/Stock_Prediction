@@ -1,0 +1,513 @@
+----------
+# TESLA STOCK PRICE PREDICTION USING DEEP LEARNING (SimpleRNN & LSTM)
+
+**Internship Name:** Internship Project – Financial Services & Deep Learning
+**Your Name:** Akash Jalapati
+**Date:** January 5, 2026
+----------
+
+
+
+----------
+## PROBLEM STATEMENT
+
+Stock market prices are highly dynamic and influenced by multiple factors such as market trends, investor sentiment, and economic conditions. Predicting stock prices accurately is a challenging task due to their sequential and time-dependent nature. Traditional machine learning models often fail to capture long-term dependencies present in financial time-series data.
+
+The objective of this project is to build a deep learning–based time series forecasting system to predict the **closing price of Tesla (TSLA) stock** using historical stock market data. Since stock price data follows a sequential pattern, **Recurrent Neural Network (RNN)**–based architectures are well suited for this problem. In this project, two deep learning models—**SimpleRNN** and **Long Short-Term Memory (LSTM)**—are implemented and compared to analyze their effectiveness in learning temporal patterns in stock price movements.
+
+The models are designed to forecast the future behavior of Tesla’s closing price over multiple time horizons, including **1-day, 5-day, and 10-day predictions**, and their performance is evaluated using standard regression metrics.
+----------
+
+
+
+
+----------
+## PROJECT OBJECTIVE
+
+The objective of this project is to predict the future **closing price of Tesla stock** using historical price data.
+Time-series deep learning models such as **SimpleRNN and LSTM** are used to learn patterns from sequential stock data.
+The models are trained to forecast **1-day, 5-day, and 10-day** future price movements.
+Model performance is evaluated and compared using **Mean Squared Error (MSE) and RMSE**.
+----------
+
+
+
+
+----------
+### SOURCE
+
+The dataset used in this project contains historical stock price data of **Tesla Inc. (TSLA)**. It includes daily trading information collected from a publicly available financial data source and is suitable for time-series analysis and forecasting tasks.
+----------
+
+
+----------
+### DATASET DESCRIPTION
+
+The dataset consists of **2416 rows and 7 columns**, representing daily stock trading records over multiple years.
+----------
+
+
+----------
+### DATE RANGE
+
+* **Start Date:** 2010-06-29
+* **End Date:** 2020-02-03
+
+This long time span provides sufficient historical data to train and evaluate deep learning–based forecasting models.
+----------
+
+
+
+----------
+### FEATURES
+
+The dataset includes the following features:
+
+* **Date:** Trading date (converted to datetime format for time-series analysis)
+* **Open:** Opening price of the stock on a given day
+* **High:** Highest price of the stock on a given day
+* **Low:** Lowest price of the stock on a given day
+* **Close:** Closing price of the stock on a given day
+* **Adj Close:** Adjusted closing price accounting for corporate actions
+* **Volume:** Number of shares traded on a given day
+
+All price-related features are of type `float64`, the volume feature is of type `int64`, and the Date column was initially of type `object` and later converted to `datetime`.
+----------
+
+
+
+----------
+### TARGET VARIABLE
+
+The **Closing Price (Adj Close)** is selected as the target variable for this project, as it best represents the final stock price after market adjustments and is commonly used in financial forecasting.
+----------
+
+
+
+----------
+### MISSING VALUES ANALYSIS
+
+An inspection of the dataset shows that there are **no missing values** in any of the features. Therefore, no imputation was required at this stage; however, missing value handling strategies are discussed as part of the preprocessing methodology for time-series data.
+----------
+
+
+
+----------
+## TIME-SERIES SEQUENCE CREATION
+
+The time-series data was transformed into supervised learning sequences using a sliding window approach with a window size of 60 days. This allows the deep learning models to learn temporal dependencies from past stock prices.
+----------
+
+
+
+----------
+### SEQUENCE CREATION
+
+**1-Day Prediction:**
+
+* Input shape: (1872, 60, 1)
+* Output shape: (1872, 1, 1)
+* Interpretation: 1,872 samples were created, where each input contains stock prices of the past 60 days to predict the next 1 day closing price.
+
+**5-Day Prediction:**
+
+* Input shape: (1868, 60, 1)
+* Output shape: (1868, 5, 1)
+* Interpretation: Each input sequence of 60 days is used to predict the next 5 days of closing prices.
+
+**10-Day Prediction:**
+
+* Input shape: (1863, 60, 1)
+* Output shape: (1863, 10, 1)
+* Interpretation: The model learns from 60 past days to forecast the next 10 days of stock prices.
+
+The decrease in the number of samples with higher forecast horizons is expected, as more future data points are required to create each sequence. This sequence preparation enables the SimpleRNN and LSTM models to effectively capture temporal patterns in Tesla’s stock price movements.
+----------
+
+
+----------
+## MODEL BUILDING
+
+This section describes the deep learning architectures used to model and predict Tesla’s stock closing prices. Since stock price data is sequential in nature, **Recurrent Neural Network (RNN)**–based models are employed to capture temporal dependencies present in historical price movements.
+----------
+
+
+
+----------
+## SimpleRNN ARCHITECTURE
+
+The **Simple Recurrent Neural Network (SimpleRNN)** is the first deep learning model implemented in this project. SimpleRNN processes sequential data by maintaining a hidden state that carries information from previous time steps, making it suitable for basic time-series forecasting tasks.
+----------
+
+
+----------
+### ARCHITECTURE OVERVIEW
+
+The SimpleRNN model is built using the Keras Sequential API and consists of the following layers:
+
+1. **Input Layer**
+
+   * Input shape: `(60, 1)`
+   * Represents a sequence of the past 60 days of adjusted closing prices.
+   * Each time step contains a single feature (Adj Close).
+
+2. **SimpleRNN Layer**
+
+   * Units: 50
+   * Activation function: `tanh`
+   * This layer learns temporal patterns by processing the input sequence one time step at a time and updating its hidden state accordingly.
+
+3. **Dropout Layer**
+
+   * Dropout rate: 0.2
+   * Randomly drops 20% of the neurons during training to reduce overfitting and improve generalization.
+
+4. **Dense Output Layer**
+
+   * Number of neurons depends on the forecast horizon:
+
+     * 1 neuron for 1-day prediction
+     * 5 neurons for 5-day prediction
+     * 10 neurons for 10-day prediction
+   * Outputs the predicted future closing prices.
+----------
+
+
+----------
+### MODEL COMPILATION
+
+The SimpleRNN model is compiled using the following configuration:
+
+* **Optimizer:** Adam
+* **Learning Rate:** 0.001
+* **Loss Function:** Mean Squared Error (MSE)
+
+MSE is chosen as the loss function because stock price prediction is a regression problem, and MSE effectively penalizes larger prediction errors.
+----------
+
+
+----------
+### TRAINING STRATEGY
+
+The model is trained using an **80–20 train–test split**, where 80% of the data is used for training and 20% for validation. To ensure optimal training performance, the following callbacks are applied:
+
+* **EarlyStopping:**
+  Training is stopped if the validation loss does not improve for 10 consecutive epochs. This prevents overfitting and unnecessary training.
+
+* **ModelCheckpoint:**
+  The model with the lowest validation loss is automatically saved during training, ensuring that the best-performing version of the model is preserved.
+----------
+
+
+
+
+----------
+### PURPOSE OF USING SimpleRNN
+
+The SimpleRNN model serves as a **baseline deep learning model** in this project. It provides insight into how well a basic recurrent architecture can learn short-term dependencies in stock price data. However, SimpleRNN models may struggle with long-term dependencies due to the vanishing gradient problem.
+
+This limitation motivates the use of more advanced architectures such as **Long Short-Term Memory (LSTM)** networks, which are explored in subsequent sections and compared against SimpleRNN to evaluate performance improvements.
+---------
+
+
+----------
+### LSTM ARCHITECTURE
+The Long Short-Term Memory (LSTM) network is an advanced recurrent neural network architecture implemented in this project to overcome the limitations of SimpleRNN in learning long-term dependencies. LSTM models are specifically designed to retain relevant historical information over longer time periods, making them highly suitable for financial time-series forecasting such as stock price prediction.
+----------
+
+----------
+### ARCHITECTURE OVERVIEW
+
+The LSTM model is built using the Keras Sequential API and consists of the following layers:
+
+Input Layer
+
+Input shape: (60, 1)
+
+Represents a sequence of the past 60 days of adjusted closing prices.
+
+Each time step contains a single feature (Adj Close), consistent with the SimpleRNN model for fair comparison.
+
+LSTM Layer
+
+Units: 50
+
+Activation function: tanh
+
+The LSTM layer processes sequential data using internal memory cells and gating mechanisms (input, forget, and output gates).
+
+These gates allow the model to selectively retain or discard information from previous time steps, enabling the learning of long-term temporal patterns in stock prices.
+
+Dropout Layer
+
+Dropout rate: 0.2
+
+Randomly disables 20% of neurons during training to reduce overfitting and improve model generalization.
+
+Dense Output Layer
+
+Number of neurons depends on the forecast horizon:
+
+1 neuron for 1-day prediction
+
+5 neurons for 5-day prediction
+
+10 neurons for 10-day prediction
+
+Outputs the predicted future closing prices based on learned temporal representations.
+----------
+
+
+
+----------
+### MODEL COMPILATION
+
+The LSTM model is compiled using the same configuration as the SimpleRNN model to ensure a fair performance comparison:
+
+Optimizer: Adam
+
+Learning Rate: 0.001
+
+Loss Function: Mean Squared Error (MSE)
+
+Mean Squared Error is used because the task involves continuous-valued stock price prediction, and MSE effectively penalizes larger deviations between predicted and actual prices.
+----------
+
+----------
+### TRAINING STRATEGY
+
+The LSTM model is trained using an 80–20 train–test split, identical to the SimpleRNN setup. The following callbacks are used to optimize training:
+
+EarlyStopping:
+Training is halted if the validation loss does not improve for 10 consecutive epochs. This helps prevent overfitting and ensures efficient training.
+
+ModelCheckpoint:
+The model with the lowest validation loss is automatically saved during training. This guarantees that the best-performing LSTM model is retained for evaluation and comparison.
+----------
+
+
+----------
+### PURPOSE OF USING LSTM
+
+The LSTM model is designed to address the shortcomings of SimpleRNN by effectively capturing long-term dependencies in time-series data. Its internal memory mechanism allows it to learn complex temporal patterns that are common in financial markets.
+
+Compared to SimpleRNN, the LSTM model demonstrates:
+
+Improved training stability
+
+Better retention of historical information
+
+Superior performance for multi-step forecasts (5-day and 10-day predictions)
+----------
+
+
+
+----------
+### HYPERPARAMETER TUNING
+
+Hyperparameter tuning is performed using GridSearchCV in combination with the SciKeras KerasRegressor wrapper. This enables seamless integration of Keras deep learning models with Scikit-learn’s hyperparameter search utilities.
+
+The following hyperparameters are tuned:
+
+Number of RNN/LSTM units: [32, 50, 64]
+
+Dropout rate: [0.2, 0.3]
+
+Learning rate: [0.001, 0.0005]
+
+Batch size: 32
+
+Epochs: 20
+
+GridSearchCV evaluates multiple parameter combinations using 3-fold cross-validation and selects the configuration that minimizes validation Mean Squared Error.
+----------
+
+
+
+----------
+### MODEL EVALUATION
+
+Model performance is evaluated using standard regression metrics:
+
+Mean Squared Error (MSE):
+Measures the average squared difference between actual and predicted prices.
+
+Root Mean Squared Error (RMSE):
+Provides error magnitude in the same units as stock prices, making it more interpretable.
+
+Lower MSE and RMSE values indicate better predictive accuracy.
+----------
+
+----------
+### PREDICTION VISUALISATION
+
+To visually assess model performance, Actual vs Predicted closing price plots are generated for:
+
+1-day forecast
+
+5-day forecast
+
+10-day forecast
+
+These plots demonstrate how closely the predicted values follow the actual stock price trends over time.
+----------
+
+
+----------
+### RESULTS and COMPARISON
+
+The experimental results show that:
+
+SimpleRNN performs reasonably well for short-term (1-day) predictions.
+
+LSTM consistently outperforms SimpleRNN for longer horizons (5-day and 10-day forecasts).
+
+LSTM produces smoother predictions and better captures long-term price trends.
+
+Overall, LSTM achieves lower MSE and RMSE values compared to SimpleRNN.
+----------
+
+
+
+----------
+### BUSINESS USE CASES
+
+This stock price prediction system can be applied in:
+
+Investment decision support systems
+
+Algorithmic trading strategies
+
+Portfolio risk analysis
+
+Financial market trend forecasting
+
+Retail investor advisory platforms
+
+Insights and Limitations
+----------
+
+
+----------
+### KEY INSIGHTS
+
+Deep learning models can effectively capture temporal dependencies in stock data.
+
+LSTM networks outperform SimpleRNN for multi-step forecasting tasks.
+
+Sequence length and scaling significantly impact model performance.
+----------
+
+
+----------
+### LIMITATIONS
+
+Models rely only on historical price data and do not include external factors such as news or macroeconomic indicators.
+
+Stock markets are inherently volatile and unpredictable.
+
+Predictions should not be treated as guaranteed financial advice.
+----------
+
+
+----------
+### CONCLUSION and FUTURE SCOPE
+
+This project successfully demonstrates the application of SimpleRNN and LSTM deep learning models for time-series forecasting of Tesla stock prices. The results highlight the superiority of LSTM models in capturing long-term dependencies and improving forecast accuracy.
+----------
+
+----------
+### FUTURE ENHANCEMENTS
+
+Incorporating technical indicators (RSI, MACD, Moving Averages)
+
+Adding sentiment analysis from news and social media
+
+Using advanced architectures such as GRU, Bidirectional LSTM, or Transformers
+
+Deploying the model as a real-time web application using Streamlit
+----------
+
+
+
+
+
+----------
+### MODEL EVALUATION & COMPARISON 
+
+This phase focuses on a detailed performance comparison between the SimpleRNN and LSTM models. The objective is to identify the most reliable architecture for predicting Tesla stock prices across different forecast horizons.
+
+Both models are evaluated using Mean Squared Error (MSE) and Root Mean Squared Error (RMSE) for 1-day, 5-day, and 10-day forecasts.
+----------
+
+
+
+
+----------
+### MODEL COMPARISON METRICS
+
+The following evaluation metrics are used:
+
+Mean Squared Error (MSE):
+Measures the average squared difference between actual and predicted values.
+
+Root Mean Squared Error (RMSE):
+Represents the prediction error in original price units, making it easier to interpret.
+
+Lower values of MSE and RMSE indicate better predictive performance.
+----------
+
+
+
+
+
+----------
+### COMPARISON TABLE: 
+SimpleRNN vs LSTM
+Forecast Horizon	Model	        MSE	       RMSE
+1-Day	            SimpleRNN	 0.0022	    0.0466
+	               LSTM	       0.0038	    0.0618
+                  
+                  
+5-Day	            SimpleRNN	 0.0157	    0.1252
+	               LSTM	       0.0150	    0.1224
+
+
+10-Day	         SimpleRNN	 0.0719	    0.2682
+	               LSTM	       0.0222	    0.1490
+----------
+
+
+
+
+
+----------
+### PERFORMANCE ANALYSIS
+
+1-Day Forecast:
+SimpleRNN achieves lower error values than LSTM, making it slightly better for short-term predictions.
+
+5-Day Forecast:
+LSTM outperforms SimpleRNN, demonstrating better generalization over multiple future time steps.
+
+10-Day Forecast:
+LSTM significantly outperforms SimpleRNN, while SimpleRNN shows a sharp increase in error.
+
+These results highlight LSTM’s strength in learning long-term temporal dependencies, which is critical for multi-step stock price forecasting.
+----------
+
+
+
+
+
+----------
+### FINAL MODEL SELECTION
+
+Based on quantitative evaluation and visual analysis:
+
+SimpleRNN is suitable for short-term (1-day) forecasting
+
+LSTM is the preferred model for 5-day and 10-day forecasts
+
+LSTM is selected as the final model due to its superior long-term forecasting accuracy and stability.
+----------
