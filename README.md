@@ -180,6 +180,4 @@ Open the notebooks folder to access the project code present in three notebooks:
 
 
 ## 👨‍💻 Author
-
 Akash Jalapati
-If you want, I can also show you one README section that makes ML projects look 10× stronger to recruiters (almost no one adds it, but it instantly signals senior-level thinking).
