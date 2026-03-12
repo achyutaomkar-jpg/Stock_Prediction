@@ -95,18 +95,12 @@ Two deep learning models are developed and compared.
 
 ---
 
-##📊 Streamlit App Features
-##1️⃣ Stock Price Prediction Module
+## 🌐 Live Streamlit App
 
-Predicts future Tesla stock prices using trained deep learning models.
+👉 **Streamlit App Link:** https://stockprediction-e2hwwnrjmqv6fm5adrjr7o.streamlit.app/
 
-## 2️⃣ Visualization Dashboard
+---
 
-Displays:
-
-- Historical stock price trends
-- Predicted vs actual stock prices
-- This allows users to interactively explore stock price predictions.
 
 ##📁 How to Use This Project (Execution Order)
 
