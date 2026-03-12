@@ -26,7 +26,7 @@ Stock_Prediction/
 │
 ├── models/                # Saved trained deep learning models (e.g., LSTM .h5/.keras files)
 │
-├── notebooks/             # Additional experiments or exploratory notebooks
+├── notebooks/             # Main Project codes and exploratory notebooks
 │
 ├── report/                # Project report, findings, and documentation
 │
